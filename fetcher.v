@@ -22,9 +22,9 @@ module fetcher(
 	input clk,
 	input rst,
     //input [channel_num - 1 : 0] val_read,
-    input val_read,
-	output [7:0] out,
-    output empty
+    input [channel_num-1:0] val_read,
+	output [(channel_num)*8-1:0] val_out,
+    output [channel_num-1:0] empty
     );
 
     // These should be templated and generated in python
@@ -35,68 +35,49 @@ module fetcher(
 
     reg [15:0] rom_addr;
     reg [15:0] val_addr;
-    //reg [15:0] col_addr;
-    //reg [15:0] len_addr;
+    reg [7:0] current_channel;
 	 
     wire [7:0] rom_out;
 
-    reg val_wr;
-    wire [7:0] val_wr_data, full;
+    reg [channel_num-1:0] val_wr;
+    wire [channel_num-1:0] full;
 
     rom rom (
-        .clk(clk),
         .a(rom_addr),
         .spo(rom_out)
     );
 
-    fifo val_fifo (
-        .clk(clk), // input clk
-        .srst(rst), // input srst
-        .din(val_wr_data), // input [7 : 0] din
-        .wr_en(val_wr), // input wr_en
-        .rd_en(val_read), // input rd_en
-        .dout(out), // output [7 : 0] dout
-        .full(full), // output full
-        .empty(empty) // output empty
+    genvar i;
+    generate 
+        for (i=0; i < channel_num; i=i+1) begin: FIFO_VAL
+            fifo val_fifo (
+                .clk(clk), // input clk
+                .srst(rst), // input srst
+                .din(rom_out), // input [7 : 0] din
+                .wr_en(val_wr[i]), // input wr_en
+                .rd_en(val_read[i]), // input rd_en
+                .dout(val_out[i*8+7:i*8]), // output [7 : 0] dout
+                .full(full[i]), // output full
+                .empty(empty[i]) // output empty
 
-    );  
-
-    //fifo col_fifo (
-        //.clk(clk), // input clk
-        //.srst(rst), // input srst
-        //.din(din), // input [7 : 0] din
-        //.wr_en(wr_en), // input wr_en
-        //.rd_en(rd_en), // input rd_en
-        //.dout(dout), // output [7 : 0] dout
-        //.full(full), // output full
-        //.empty(empty) // output empty
-
-    //);  
-
-    //fifo len_fifo (
-        //.clk(clk), // input clk
-        //.srst(rst), // input srst
-        //.din(din), // input [7 : 0] din
-        //.wr_en(wr_en), // input wr_en
-        //.rd_en(rd_en), // input rd_en
-        //.dout(dout), // output [7 : 0] dout
-        //.full(full), // output full
-        //.empty(empty) // output empty
-
-    //);  
-    
-    assign val_wr_data = rom_out;
+            );  
+        end
+    endgenerate
 
     always @ (posedge clk or posedge rst) begin
         if (rst) begin
             rom_addr <= 0;
             val_addr <= 0;
+            val_wr   <= 1;
+            current_channel <= 0;
         end
         else begin
-            if (~full) begin
-                val_wr <= 1;
-                rom_addr <= W1_val_start + val_addr;
+            if (~full[current_channel]) begin
+                rom_addr <= W1_val_start + val_addr + 1;
                 val_addr <= val_addr + 1;
+                val_wr[current_channel] = 0;
+                current_channel = current_channel == channel_num - 1 ? 0 : current_channel + 1;
+                val_wr[current_channel] = 1;
             end
         end
     end
