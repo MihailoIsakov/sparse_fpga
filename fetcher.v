@@ -64,8 +64,9 @@ module fetcher(
     always @ (posedge clk or posedge rst) begin
         if (rst) begin
             rom_addr = 0;
+            // TODO add address instantiation code here!
             addr[0] = 0;
-            wr_en <= 1;
+            wr_en <= 0;
             lane <= 0;
         end
         else begin

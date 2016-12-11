@@ -52,7 +52,7 @@ module t_fetcher;
         #55 rst = 0;
 
         //#40 read = 12'hFFFF;
-        #40 read = 12'h0001;
+        #40 read = 12'h0003;
 
 		// Wait 100 ns for global reset to finish
 		#100;
