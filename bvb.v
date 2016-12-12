@@ -41,7 +41,7 @@ module bvb(
         for (f=0; f<channel_num; f=f+1) begin: FIFO_BVB
             fifo_bvb fifo_bvb(
                 .clk(clk), // input clk
-                .din(ram_out[local_id[f]+7-:7]), // input [7 : 0] din
+                .din(ram_out[local_id[f]+7-:8]), // input [7 : 0] din
                 .wr_en(val_wr_en[f]), // input wr_en
                 .rd_en(val_read[f]), // input rd_en
                 .dout(val[f*8+7:f*8]), // output [7 : 0] dout
@@ -55,15 +55,15 @@ module bvb(
     genvar i;
     generate
         for (i=0; i<channel_num; i=i+1) begin: MUX
-            always @ (clk) begin
+            always @ (posedge clk) begin
                 // check the counter_bits MSB of id == counter
                 if (counter == id[i*col_id_size+col_id_size-1:i*col_id_size+col_id_size-counter_bits] 
-                    & id_empty[i] == 0
-                    & val_empty[i]) begin 
+                    & ~id_empty[i]
+                    & ~val_full[i]) begin 
                     
                     id_read[i]   <= 1;
                     val_wr_en[i] <= 1;
-                    local_id[i]  <= id * 8; 
+                    local_id[i]  <= id[i*10+9:i*10] << 3; 
                 end
                 else begin
                     id_read[i]   <= 0;
@@ -77,6 +77,7 @@ module bvb(
     always @ (posedge clk) begin
         if (rst) begin
             counter <= 0;
+            image_start <= 0;
         end
         else begin
             counter <= (counter == counter_max) ? 0 :counter + 1;

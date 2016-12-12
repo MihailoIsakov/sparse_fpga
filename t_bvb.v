@@ -51,19 +51,23 @@ module t_bvb;
     always
         #1 clk = ~clk;
 
+    always 
+        #2 id = id + 1;
+
 	initial begin
 		// Initialize Inputs
 		clk = 0;
 		rst = 0;
 		id = 0;
-		id_empty = 0;
+		id_empty = 15;
 		val_read = 0;
 
         #20 rst = 1;
         #20 rst = 0;
 
-        #20 id = 40'b0000000100000000001100000000100000000001; // 4 3 2 1
-            id_empty = 0;
+        #20 id_empty = 0;
+
+        #50 val_read = 15;
 
 		// Wait 100 ns for global reset to finish
 		#100;
