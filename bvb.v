@@ -5,7 +5,7 @@ module bvb(
     // input fifo connections
     input  [channel_num*col_id_size-1:0] id,
     input  [channel_num-1:0] id_empty,
-    output [channel_num-1:0] id_read,
+    output reg [channel_num-1:0] id_read,
 
     // output fifo outputs
     output [channel_num*8-1:0] val,
@@ -18,18 +18,21 @@ module bvb(
     parameter counter_bits = 3;
     parameter counter_max  = 8;  // if ram has 8 sections
 
+    reg [6:0] image_start;
     reg [counter_bits-1:0] counter; // counts on which cell in ram we are
 
-    wire [channel_num-1:0]   val_wr_en;
+    reg [channel_num-1:0]   val_wr_en;
     wire [channel_num-1:0]   val_full;
 
     wire [1023:0] ram_out;
 
-    vector_ram instance_name (
+    reg [9:0] local_id [channel_num-1:0];
+
+    vector_ram vector_ram (
         .clk(clk), 
         .write_enable(), 
         .in(), 
-        .addr(counter), 
+        .addr(image_start + counter), 
         .out(ram_out)
     );
 
@@ -38,10 +41,10 @@ module bvb(
         for (f=0; f<channel_num; f=f+1) begin: FIFO_BVB
             fifo_bvb fifo_bvb(
                 .clk(clk), // input clk
-                .din(ram_out[id[f*col_id_size*col_id_size-1:f*col_id_size]]), // input [7 : 0] din
+                .din(ram_out[local_id[f]+7-:7]), // input [7 : 0] din
                 .wr_en(val_wr_en[f]), // input wr_en
                 .rd_en(val_read[f]), // input rd_en
-                .dout(val[f*8-7:f*8]), // output [7 : 0] dout
+                .dout(val[f*8+7:f*8]), // output [7 : 0] dout
                 .full(val_full[f]), // output full
                 .empty(val_empty[f]) // output empty
 
@@ -60,6 +63,7 @@ module bvb(
                     
                     id_read[i]   <= 1;
                     val_wr_en[i] <= 1;
+                    local_id[i]  <= id * 8; 
                 end
                 else begin
                     id_read[i]   <= 0;
@@ -79,3 +83,4 @@ module bvb(
         end
     end
 
+endmodule   
