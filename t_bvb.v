@@ -23,29 +23,30 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 module t_bvb;
+    `include "params.vh"
 
 	// Inputs
 	reg clk;
 	reg rst;
-	reg [39:0] id;
-	reg [3:0] id_empty;
-	reg [3:0] val_read;
+	reg [channel_num*col_id_size-1:0] id;
+	reg [channel_num-1:0] id_empty;
+	reg [channel_num-1:0] vec_read;
 
 	// Outputs
-	wire [3:0] id_read;
-	wire [31:0] val;
-	wire [3:0] val_empty;
+	wire [channel_num-1:0] id_read;
+	wire [channel_num*val_bits-1:0] vec;
+	wire [channel_num-1:0] vec_empty;
 
 	// Instantiate the Unit Under Test (UUT)
-	bvb uut (
+	bvb bvb (
 		.clk(clk), 
 		.rst(rst), 
-		.id(id), 
-		.id_empty(id_empty), 
-		.id_read(id_read), 
-		.val(val), 
-		.val_empty(val_empty), 
-		.val_read(val_read)
+		.id(id),                    // input 
+		.id_fifo_empty(id_empty),   // input
+		.id_fifo_read(id_read),     // output
+		.vec(vec),                  // output
+		.vec_fifo_empty(vec_empty), // output
+		.vec_fifo_read(vec_read)    // input
 	);
 
     always
@@ -60,14 +61,14 @@ module t_bvb;
 		rst = 0;
 		id = 0;
 		id_empty = 15;
-		val_read = 0;
+		vec_read = 0;
 
         #20 rst = 1;
         #20 rst = 0;
 
         #20 id_empty = 0;
 
-        #50 val_read = 15;
+        #50 vec_read = 15;
 
 		// Wait 100 ns for global reset to finish
 		#100;
