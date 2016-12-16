@@ -35,7 +35,7 @@ module bvb(
 
     reg [bvb_addr_size:0] image_start;
     reg [ram_split_bits-1:0] counter; // counts on which cell in ram we are
-    wire [ram_width:0] ram_out; // wire from the ram to the FIFOs
+    wire [ram_width-1:0] ram_out; // wire from the ram to the FIFOs
 
     // RAM has a width of ram_width
     // each image can be split into ram_splits chunks of ram_width bits
@@ -54,10 +54,10 @@ module bvb(
         for (f=0; f<channel_num; f=f+1) begin: FIFO_BVB
             fifo_bvb fifo_bvb(
                 .clk(clk), // input clk
-                .din(ram_out[local_id[f]+val_bits-1-:val_bits]), // input [7 : 0] din
+                .din(ram_out[(local_id[f]+1)*val_bits-1-:val_bits]), // input [7 : 0] din
                 .wr_en(vec_fifo_wr_en[f]), // input wr_en
                 .rd_en(vec_fifo_read[f]), // input rd_en
-                .dout(vec[f*val_bits+val_bits-1:f*val_bits]), // output [7 : 0] dout
+                .dout(vec[(f+1)*val_bits-1:f*val_bits]), // output [7 : 0] dout
                 .full(vec_fifo_full[f]), // output full
                 .empty(vec_fifo_empty[f]) // output empty
             );
@@ -89,7 +89,7 @@ module bvb(
 
 
     // moves the counter around
-    always @ (posedge clk) begin
+    always @ (negedge clk) begin
         if (rst) begin
             counter <= 0;
             image_start <= 0;
