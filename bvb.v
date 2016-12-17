@@ -10,7 +10,7 @@ module bvb(
     output reg [channel_num-1:0]         id_fifo_read,
 
     // output fifo outputs, this fifo is inside the module
-    output [channel_num*8-1:0] vec,
+    output [channel_num*val_bits-1:0] vec,
     output [channel_num-1:0]   vec_fifo_empty,
     input  [channel_num-1:0]   vec_fifo_read
 );
