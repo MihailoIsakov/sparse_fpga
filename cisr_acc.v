@@ -28,7 +28,7 @@ module cisr_acc(
 
     reg [counter_size-1:0]     counters     [channel_num-1:0]; // keeps track how many more elements need to be processed
     reg [row_id_size-1:0]      row_ids      [channel_num-1:0]; // keeps track of where the results should be written
-    reg [accumulator_size-1:0] accumulators [channel_num-1:0]; // accumulators, TODO the size could be better defined
+    reg signed [accumulator_size-1:0] accumulators [channel_num-1:0]; // accumulators, TODO the size could be better defined
 
     reg [row_id_size-1:0]  next_id; // next id to be assigned to a channel
 
@@ -41,7 +41,14 @@ module cisr_acc(
     wire has_zero_counters;
     wire [channel_num_log-1:0] first_index;
     first_one first_one(is_zero, first_index, has_zero_counters);
+    //
 
+    // converting mult vector into signed memory
+    wire signed [mult_size-1:0] mults [channel_num-1:0];
+    generate for(j=0; j<channel_num; j=j+1) begin: SIGNED_MULT
+        assign mults[j] = mult_fifo_data[j*mult_size+:mult_size];
+    end endgenerate
+    //
 
     always @ (posedge clk) begin
         if (rst) begin
@@ -79,7 +86,8 @@ module cisr_acc(
                         counters[i] = counters[i] - 1;
                         // add the next value
                         //accumulators[i] = accumulators[i] + mult_fifo_data[(i+1)*mult_size-1-:(mult_size)];
-                        accumulators[i] = accumulators[i] + mult_fifo_data[i*mult_size+:mult_size];
+                        //accumulators[i] = accumulators[i] + mult_fifo_data[i*mult_size+:mult_size];
+                        accumulators[i] = accumulators[i] + mults[i];
                         // set FIFO to read
                         mult_fifo_read[i] <= 1; 
                     end

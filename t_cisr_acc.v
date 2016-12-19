@@ -57,7 +57,6 @@ module t_cisr_acc;
     always 
         #1 clk = ~clk;
 
-
 	initial begin
 		// Initialize Inputs
 		clk = 0;
@@ -73,7 +72,7 @@ module t_cisr_acc;
             row_len_fifo_empty = 0;
             mult_fifo_empty    = 0;
             row_len_fifo_data  = {8'd4, 8'd43, 8'd55, 8'd17};
-            mult_fifo_data    = {16'd46, 16'd3, 16'd193, 16'd554};
+            mult_fifo_data    = {16'd46, 16'd3, -16'd193, 16'd554};
 
         #40 mult_fifo_empty = 15;
         #10 mult_fifo_empty = 0;
