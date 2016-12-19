@@ -45,11 +45,14 @@ module cisr_acc(
 
     always @ (posedge clk) begin
         if (rst) begin
-            next_id <= channel_num; // the assigned ids at the start range from 0 to channel_num-1
+            next_id <= 0; // the assigned ids at the start range from 0 to channel_num-1
+            row_len_fifo_read <= 0;
+            mult_fifo_read    <= 0;
 
             for (i=0; i<channel_num; i=i+1) begin
-                counters[i] <= 0;
-                row_ids[i]  <= i; // the assigned ids at the start range from 0 to channel_num-1
+                counters[i]     <= 0;
+                row_ids[i]      <= 0; // (OR NOT) the assigned ids at the start range from 0 to channel_num-1
+                accumulators[i] <= 0;
             end 
         end
         else begin
@@ -59,8 +62,8 @@ module cisr_acc(
                     accumulators[first_index] <= 0;
                     
                     // load new row length into the counter
-                    //counters[first_index] = row_len_fifo_data[(first_index+1)*row_len_size-1:first_index*row_len_size];
-                    counters[first_index] <= row_len_fifo_data[(first_index+1)*row_len_size-1-:(row_len_size-1)];
+                    //counters[first_index] <= row_len_fifo_data[(first_index+1)*row_len_size-1-:(row_len_size-1)];
+                    counters[first_index] <= row_len_fifo_data[first_index*row_len_size+:row_len_size];
                     row_len_fifo_read[first_index] <= 1;
                     
                     // get the next row_id
@@ -75,8 +78,8 @@ module cisr_acc(
                         // decrement counters
                         counters[i] = counters[i] - 1;
                         // add the next value
-                        //accumulators[i] = accumulators[i] + mult_fifo_data[(i+1)*mult_size-1:i*mult_size];
-                        accumulators[i] = accumulators[i] + mult_fifo_data[(i+1)*mult_size-1-:(mult_size-1)];
+                        //accumulators[i] = accumulators[i] + mult_fifo_data[(i+1)*mult_size-1-:(mult_size)];
+                        accumulators[i] = accumulators[i] + mult_fifo_data[i*mult_size+:mult_size];
                         // set FIFO to read
                         mult_fifo_read[i] <= 1; 
                     end
