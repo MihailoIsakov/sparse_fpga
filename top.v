@@ -73,6 +73,7 @@ module top(
     wire [val_bits*2*channel_num-1:0] mult_fifo_out;
     wire [channel_num-1:0]            mult_fifo_empty;
     wire [channel_num-1:0]            mult_fifo_read;
+    wire [val_bits*2-1:0]             mults [channel_num-1:0];
 
     channel channel(
         .clk(clk),
@@ -90,18 +91,42 @@ module top(
         .mult_fifo_empty(mult_fifo_empty),
         .mult_fifo_read(mult_fifo_read)
     );
+    //
+    
+    // CISR + accumulator
+    wire cisr_write;
+    wire [row_id_size-1:0] cisr_addr;
+    wire [accumulator_size-1:0] cisr_data;
+
+    cisr_acc cisr_acc (
+        .clk(clk),
+        .rst(rst),
+        // row length input fifo
+        .row_len_fifo_data(len_fifo_out),
+        .row_len_fifo_empty(len_fifo_empty),
+        .row_len_fifo_read(len_fifo_read),
+        // mult input fifo
+        .mult_fifo_data(mult_fifo_out),
+        .mult_fifo_empty(mult_fifo_empty),
+        .mult_fifo_read(mult_fifo_read),
+        //
+        .write_data(cisr_write),
+        .addr_data(cisr_addr),
+        .data(cisr_data)
+    );
     
 
     // convert vectors to memories
     generate 
         for (i=0; i<channel_num; i=i+1) begin: VECTOR2MEMORY
-            assign vals[i] = val_fifo_out[i*val_bits+:val_bits];
-            assign cols[i] = col_fifo_out[i*col_id_size+:col_id_size];
-            assign lens[i] = len_fifo_out[i*row_len_size+:row_len_size];
-            assign vecs[i] = vec_fifo_out[i*val_bits+:val_bits];
+            assign vals[i]  = val_fifo_out[i*val_bits+:val_bits];
+            assign cols[i]  = col_fifo_out[i*col_id_size+:col_id_size];
+            assign lens[i]  = len_fifo_out[i*row_len_size+:row_len_size];
+            assign vecs[i]  = vec_fifo_out[i*val_bits+:val_bits];
+            assign mults[i] = mult_fifo_out[i*2*val_bits+:val_bits*2];
         end
     endgenerate
 
-    assign vec_fifo_read = 15;
+    //assign mult_fifo_read = 15;
 
 endmodule
