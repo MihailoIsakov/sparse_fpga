@@ -36,7 +36,7 @@ module value_fetcher(
     // inputs to the column FIFO
     reg  [channel_num-1:0] wr_en;
     wire [channel_num-1:0] full;
-    wire [8:0] rom_out;
+    wire [val_bits-1:0] rom_out;
 
     rom8 rom (
         .clka(clk),
