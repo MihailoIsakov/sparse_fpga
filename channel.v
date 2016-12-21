@@ -26,7 +26,7 @@ module channel(
     wire [channel_num-1:0] mult_fifo_write;
     wire [channel_num-1:0] mult_fifo_full;
 
-    assign mult_fifo_write = (~vec_fifo_empty && ~mat_fifo_empty && ~mult_fifo_full); 
+    assign mult_fifo_write = (~vec_fifo_empty & ~mat_fifo_empty & ~mult_fifo_full); 
     assign vec_fifo_read = mult_fifo_write;
     assign mat_fifo_read = mult_fifo_write;
 
@@ -43,7 +43,7 @@ module channel(
             .din(signed_res[i]),
             .wr_en(mult_fifo_write[i]),
             .rd_en(mult_fifo_read[i]),
-            .dout(mult[i*mult_size+:mult_size]),
+            .dout(mult[i*val_bits*2+:val_bits*2]),
             .full(mult_fifo_full[i]),
             .empty(mult_fifo_empty[i])
         );
