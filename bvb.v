@@ -1,5 +1,3 @@
-
-
 module bvb(
     input clk,
     input rst,
@@ -42,7 +40,7 @@ module bvb(
     // the counter goes over the image, iteratively loading the next chunk
     vector_ram vector_ram (
         .clk(clk), 
-        .write_enable(), // we wont be doing any writing
+        .write_enable(0), // we wont be doing any writing
         .in(), 
         .addr(image_start + counter), 
         .out(ram_out)
@@ -54,10 +52,11 @@ module bvb(
         for (f=0; f<channel_num; f=f+1) begin: FIFO_BVB
             fifo_bvb fifo_bvb(
                 .clk(clk), // input clk
-                .din(ram_out[(local_id[f]+1)*val_bits-1-:val_bits]), // input [7 : 0] din
+                //.din(ram_out[(local_id[f]+1)*val_bits-1-:val_bits]), // input [7 : 0] din
+                .din(ram_out[local_id[f]*val_bits+:val_bits]), // input [7 : 0] din
                 .wr_en(vec_fifo_wr_en[f]), // input wr_en
                 .rd_en(vec_fifo_read[f]), // input rd_en
-                .dout(vec[(f+1)*val_bits-1:f*val_bits]), // output [7 : 0] dout
+                .dout(vec[f*val_bits+:val_bits]), // output [7 : 0] dout
                 .full(vec_fifo_full[f]), // output full
                 .empty(vec_fifo_empty[f]) // output empty
             );
@@ -100,3 +99,4 @@ module bvb(
     end
 
 endmodule   
+
