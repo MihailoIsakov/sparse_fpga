@@ -8,20 +8,16 @@ module cisr_acc(
     output reg [channel_num-1:0]              row_len_fifo_read, 
 
     // channel multiplier FIFO
-    input      [mult_size*channel_num-1:0] mult_fifo_data, 
+    input      [val_bits*2*channel_num-1:0] mult_fifo_data, 
     input      [channel_num-1:0]           mult_fifo_empty, 
     output reg [channel_num-1:0]           mult_fifo_read, 
 
     //saving 
     output                        write_data,
     output [row_id_size-1:0]      addr_data,
-    output [accumulator_size-1:0] data
+    output reg [accumulator_size-1:0] data
 );
     `include "params.vh"
-
-    parameter counter_size     = 8; // must be greater than the number of elements in a row, 4 bits should be fine
-    parameter row_id_size      = 8; // must be greater than log2(len(vector))
-    parameter accumulator_size = 32;
 
     genvar j;
     integer i;
@@ -44,10 +40,12 @@ module cisr_acc(
     //
 
     // converting mult vector into signed memory
-    wire signed [mult_size-1:0] mults [channel_num-1:0];
-    generate for(j=0; j<channel_num; j=j+1) begin: SIGNED_MULT
-        assign mults[j] = mult_fifo_data[j*mult_size+:mult_size];
-    end endgenerate
+    wire signed [val_bits*2-1:0] mults [channel_num-1:0];
+    generate 
+        for(j=0; j<channel_num; j=j+1) begin: SIGNED_MULT
+            assign mults[j] = mult_fifo_data[j*val_bits*2+:val_bits*2];
+        end 
+    endgenerate
     //
 
     always @ (posedge clk) begin
@@ -63,31 +61,34 @@ module cisr_acc(
             end 
         end
         else begin
+            row_len_fifo_read = 0; // dont read lengths. If any counter is zero, some bit will be set to 1 later.
+
             if (has_zero_counters) begin // if any channel has finished processing a row, stop and process
                 if (~row_len_fifo_empty[first_index]) begin // if the channel cant load the next row_length, stall
                     // reset accumulator
+                    data <= accumulators[first_index];
                     accumulators[first_index] <= 0;
                     
                     // load new row length into the counter
                     //counters[first_index] <= row_len_fifo_data[(first_index+1)*row_len_size-1-:(row_len_size-1)];
                     counters[first_index] <= row_len_fifo_data[first_index*row_len_size+:row_len_size];
-                    row_len_fifo_read[first_index] <= 1;
+                    row_len_fifo_read[first_index] = 1;
                     
                     // get the next row_id
                     row_ids[first_index] <= next_id;
                     next_id <= next_id + 1;
                 end else begin //stalling as the emptied channel has no row_length to load
-                    row_len_fifo_read = 0;
+                    row_len_fifo_read <= 0;
                 end
             end else begin
                 if (mult_fifo_empty == 0) begin // if any of the mult fifos is empty, stall
                     for (i=0; i<channel_num; i=i+1) begin
                         // decrement counters
-                        counters[i] = counters[i] - 1;
+                        counters[i] <= counters[i] - 1;
                         // add the next value
                         //accumulators[i] = accumulators[i] + mult_fifo_data[(i+1)*mult_size-1-:(mult_size)];
                         //accumulators[i] = accumulators[i] + mult_fifo_data[i*mult_size+:mult_size];
-                        accumulators[i] = accumulators[i] + mults[i];
+                        accumulators[i] <= accumulators[i] + mults[i];
                         // set FIFO to read
                         mult_fifo_read[i] <= 1; 
                     end
@@ -101,7 +102,7 @@ module cisr_acc(
 
     // outputs 
     assign addr_data = row_ids[first_index];
-    assign data = accumulators[first_index];
+    //assign data = accumulators[first_index];
     assign write_data = has_zero_counters;
 
 endmodule
