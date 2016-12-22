@@ -126,7 +126,17 @@ module top(
             assign mults[i] = mult_fifo_out[i*2*val_bits+:val_bits*2];
         end
     endgenerate
+    
 
-    //assign mult_fifo_read = 15;
+    wire [row_id_size-1:0] max_index;
+
+    max_val max_val (
+        .clk(clk),
+        .rst(rst),
+        .enable(cisr_write),
+        .stream(cisr_data),
+        .index(cisr_addr),
+        .max_index(max_index)
+    );
 
 endmodule
