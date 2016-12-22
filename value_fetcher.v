@@ -74,13 +74,13 @@ module value_fetcher(
         else begin
             if (~full[channel]) begin
                 // TODO logic for changing channels
-                channel <= (channel == channel_num - 1) ? 0 : channel + 1;
 
                 wr_en = 0;
                 wr_en[channel] = 1;
 
                 addr[channel] <= addr[channel] + 1;
             end
+            channel <= (channel == channel_num - 1) ? 0 : channel + 1;
         end
     end
 
