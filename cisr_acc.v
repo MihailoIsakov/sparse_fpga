@@ -15,7 +15,7 @@ module cisr_acc(
     //saving 
     output                            write_data,
     output [row_id_size-1:0]          addr_data,
-    output reg [accumulator_size-1:0] data
+    output [accumulator_size-1:0] data
 );
     `include "params.vh"
 
@@ -45,13 +45,13 @@ module cisr_acc(
     always @ (negedge clk) begin
         if (rst) begin
             next_id <= 0; // the assigned ids at the start range from 0 to channel_num-1
-            row_len_fifo_read <= 0;
-            mult_fifo_read    <= 0;
+            row_len_fifo_read = 0;
+            mult_fifo_read    = 0;
 
             for (i=0; i<channel_num; i=i+1) begin
                 counters[i]     <= 0;
                 row_ids[i]      <= 0; // (OR NOT) the assigned ids at the start range from 0 to channel_num-1
-                accumulators[i] <= 0;
+                accumulators[i] = 0;
             end 
         end
         else begin
@@ -62,8 +62,8 @@ module cisr_acc(
                 // TODO this may cause problems for the last element
                 if (~row_len_fifo_empty[first_index]) begin // if the channel cant load the next row_length, stall
                     // reset accumulator
-                    data <= accumulators[first_index];
-                    accumulators[first_index] <= 0;
+                    //data <= accumulators[first_index];
+                    accumulators[first_index] = 0;
                     
                     // load new row length into the counter
                     //counters[first_index] <= row_len_fifo_data[(first_index+1)*row_len_size-1-:(row_len_size-1)];
@@ -86,7 +86,7 @@ module cisr_acc(
                         mults[i] = mult_fifo_data[i*val_bits*2+:val_bits*2];
                         accumulators[i] = accumulators[i] + mults[i];
                         // set FIFO to read
-                        mult_fifo_read[i] <= 1; 
+                        mult_fifo_read[i] = 1; 
                     end
                 end
                 //else begin // stalling because not all mult fifos are non-empty
@@ -98,7 +98,7 @@ module cisr_acc(
 
     // outputs 
     assign addr_data = row_ids[first_index];
-    //assign data = accumulators[first_index];
+    assign data = accumulators[first_index];
     assign write_data = has_zero_counters;
 
 endmodule
