@@ -52,22 +52,29 @@ module t_bvb_io;
     always
         #1 clk = ~clk;
 
+    always begin 
+        #5 id[0*col_id_size+:col_id_size] = id[0*col_id_size+:col_id_size] + 1;
+           id[1*col_id_size+:col_id_size] = id[1*col_id_size+:col_id_size] + 1;
+           id[2*col_id_size+:col_id_size] = id[2*col_id_size+:col_id_size] + 1;
+           id[3*col_id_size+:col_id_size] = id[3*col_id_size+:col_id_size] + 1;
+        end
+
 	initial begin
 		// Initialize Inputs
 		clk = 0;
 		rst = 0;
 		id = 0;
-		id_empty = 15; // ID FIFOs are empty
+		id_empty = 00; // ID FIFOs are empty
 		vec_read = 0;  // nothing being read
 
         #20 rst = 1;
         #20 rst = 0;
 
-        #20 id_empty = 0;
-            id = {10'b0000000000, 10'b0010000000, 10'b0011111111, 10'b0011111110}; // 1st bank 0, 2nd bank, 0, 1023, 1022  
-        #15
-            id = {10'b0111111110, 10'b0111111111, 10'b0011111111, 10'b0011111110}; // 4th bank 1022, 1023, 2nd bank 1023, 1022  
-        #15 id_empty = 15;
+        //#20 id_empty = 0;
+            //id = {10'b0000000000, 10'b0010000000, 10'b0011111111, 10'b0011111110}; // 1st bank 0, 2nd bank, 0, 1023, 1022  
+        //#15
+            //id = {10'b0111111110, 10'b0111111111, 10'b0011111111, 10'b0011111110}; // 4th bank 1022, 1023, 2nd bank 1023, 1022  
+        //#15 id_empty = 15;
 
         #50 vec_read = 15;
 
