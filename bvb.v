@@ -91,7 +91,7 @@ module bvb(
     always @ (negedge clk) begin
         if (rst) begin
             counter <= 0;
-            image_start <= 0;
+            image_start <= 8*8;
         end
         else begin
             counter <= (counter == ram_splits) ? 0 :counter + 1;
