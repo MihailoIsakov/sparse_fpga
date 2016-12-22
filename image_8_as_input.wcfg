@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/home/mihailo/documents/classes/verilog/sparse_accelerator/t_top_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="t_top" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="9" />
+   <wvobject fp_name="/t_top/clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/t_top/rst" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/t_top/uut/max_index" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">max_index[7:0]</obj_property>
+      <obj_property name="ObjectShortName">max_index[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/t_top/uut/max_val/enable" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">enable</obj_property>
+      <obj_property name="ObjectShortName">enable</obj_property>
+   </wvobject>
+   <wvobject fp_name="/t_top/uut/max_val/stream" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">stream[31:0]</obj_property>
+      <obj_property name="ObjectShortName">stream[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/t_top/uut/max_val/max_index" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">max_index[7:0]</obj_property>
+      <obj_property name="ObjectShortName">max_index[7:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/t_top/uut/max_val/current_index" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">current_index[3:0]</obj_property>
+      <obj_property name="ObjectShortName">current_index[3:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff0000</obj_property>
+   </wvobject>
+   <wvobject fp_name="/t_top/uut/max_val/max_value" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">max_value[31:0]</obj_property>
+      <obj_property name="ObjectShortName">max_value[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/t_top/uut/max_val/index" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">index[7:0]</obj_property>
+      <obj_property name="ObjectShortName">index[7:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+</wave_config>
