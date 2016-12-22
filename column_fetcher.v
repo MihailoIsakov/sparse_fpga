@@ -47,7 +47,7 @@ module column_fetcher(
     genvar i;
     generate 
         for (i=0; i < channel_num; i=i+1) begin: FIFO_ALL
-            fifo16 fifo (
+            fifo_sxtn fifo (
                 .clk(clk), // input clk
                 .rst(rst), // input srst
                 .din(rom_out), // input [7 : 0] din
@@ -65,7 +65,7 @@ module column_fetcher(
         if (rst) begin
             current_matrix <= 0;
             channel <= 0;
-            wr_en <= 0;
+            wr_en = 0;
 
             for (j=0; j<channel_num; j=j+1)
                 addr[j] <= col_addr[j*13+:13]; // get starting address from params.vh

@@ -65,7 +65,7 @@ module value_fetcher(
         if (rst) begin
             current_matrix <= 0;
             channel <= 0;
-            wr_en <= 0;
+            wr_en = 0;
 
             for (j=0; j<channel_num; j=j+1)
                 addr[j] <= val_addr[j*13+:13]; // get starting address from params.vh

@@ -65,7 +65,7 @@ module length_fetcher(
         if (rst) begin
             current_matrix <= 0;
             channel <= 0;
-            wr_en <= 0;
+            wr_en = 0;
 
             for (j=0; j<channel_num; j=j+1)
                 addr[j] <= len_addr[j*9+:9]; // get starting address from params.vh
