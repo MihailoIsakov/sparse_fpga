@@ -35,7 +35,7 @@ module channel(
     for (i=0; i<channel_num; i=i+1) begin: WIRES2MEM
         assign signed_vec[i] = vec[i*val_bits+:val_bits];
         assign signed_mat[i] = mat[i*val_bits+:val_bits];
-        assign signed_res[i] = signed_mat[i] * signed_vec[i];
+        assign signed_res[i] = signed_mat[i] * signed_vec[i] * 2; // HACK
 
         fifo16 fifo(
             .clk(clk),
