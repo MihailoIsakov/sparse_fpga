@@ -37,7 +37,7 @@ module channel(
         assign signed_mat[i] = mat[i*val_bits+:val_bits];
         assign signed_res[i] = signed_mat[i] * signed_vec[i] * 2; // HACK
 
-        fifo16 fifo(
+        fifo_sxtn fifo(
             .clk(clk),
             .rst(rst),
             .din(signed_res[i]),
