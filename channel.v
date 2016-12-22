@@ -23,10 +23,10 @@ module channel(
     wire signed [val_bits-1:0]   signed_mat [channel_num-1:0];
     wire signed [val_bits*2-1:0] signed_res [channel_num-1:0];
 
-    wire [channel_num-1:0] mult_fifo_write;
+    reg [channel_num-1:0] mult_fifo_write;
     wire [channel_num-1:0] mult_fifo_full;
 
-    assign mult_fifo_write = (~vec_fifo_empty & ~mat_fifo_empty & ~mult_fifo_full); 
+    //assign mult_fifo_write = (~vec_fifo_empty & ~mat_fifo_empty & ~mult_fifo_full); 
     assign vec_fifo_read = mult_fifo_write;
     assign mat_fifo_read = mult_fifo_write;
 
@@ -49,4 +49,8 @@ module channel(
         );
     end
     endgenerate
+
+    always @ (negedge clk) begin
+        mult_fifo_write <= (~vec_fifo_empty & ~mat_fifo_empty & ~mult_fifo_full); 
+    end
 endmodule
