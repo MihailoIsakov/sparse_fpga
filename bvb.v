@@ -53,7 +53,7 @@ module bvb(
             fifo_bvb fifo_bvb(
                 .clk(clk), // input clk
                 //.din(ram_out[(local_id[f]+1)*val_bits-1-:val_bits]), // input [7 : 0] din
-                .din(ram_out[local_id[f]*val_bits+:val_bits]), // input [7 : 0] din
+                .din(ram_out[local_id[f]*val_bits+:val_bits]>>1), // input [7 : 0] din
                 .wr_en(vec_fifo_wr_en[f]), // input wr_en
                 .rd_en(vec_fifo_read[f]), // input rd_en
                 .dout(vec[f*val_bits+:val_bits]), // output [7 : 0] dout
