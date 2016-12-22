@@ -13,8 +13,8 @@ module cisr_acc(
     output reg [channel_num-1:0]           mult_fifo_read, 
 
     //saving 
-    output                        write_data,
-    output [row_id_size-1:0]      addr_data,
+    output                            write_data,
+    output [row_id_size-1:0]          addr_data,
     output reg [accumulator_size-1:0] data
 );
     `include "params.vh"
@@ -22,8 +22,8 @@ module cisr_acc(
     genvar j;
     integer i;
 
-    reg [counter_size-1:0]     counters     [channel_num-1:0]; // keeps track how many more elements need to be processed
-    reg [row_id_size-1:0]      row_ids      [channel_num-1:0]; // keeps track of where the results should be written
+    reg [counter_size-1:0]            counters     [channel_num-1:0]; // keeps track how many more elements need to be processed
+    reg [row_id_size-1:0]             row_ids      [channel_num-1:0]; // keeps track of where the results should be written
     reg signed [accumulator_size-1:0] accumulators [channel_num-1:0]; // accumulators, TODO the size could be better defined
 
     reg [row_id_size-1:0]  next_id; // next id to be assigned to a channel
@@ -40,15 +40,9 @@ module cisr_acc(
     //
 
     // converting mult vector into signed memory
-    wire signed [val_bits*2-1:0] mults [channel_num-1:0];
-    generate 
-        for(j=0; j<channel_num; j=j+1) begin: SIGNED_MULT
-            assign mults[j] = mult_fifo_data[j*val_bits*2+:val_bits*2];
-        end 
-    endgenerate
-    //
+    reg signed [val_bits*2-1:0] mults [channel_num-1:0];
 
-    always @ (posedge clk) begin
+    always @ (negedge clk) begin
         if (rst) begin
             next_id <= 0; // the assigned ids at the start range from 0 to channel_num-1
             row_len_fifo_read <= 0;
@@ -62,8 +56,10 @@ module cisr_acc(
         end
         else begin
             row_len_fifo_read = 0; // dont read lengths. If any counter is zero, some bit will be set to 1 later.
+            mult_fifo_read = 0;
 
             if (has_zero_counters) begin // if any channel has finished processing a row, stop and process
+                // TODO this may cause problems for the last element
                 if (~row_len_fifo_empty[first_index]) begin // if the channel cant load the next row_length, stall
                     // reset accumulator
                     data <= accumulators[first_index];
@@ -77,9 +73,9 @@ module cisr_acc(
                     // get the next row_id
                     row_ids[first_index] <= next_id;
                     next_id <= next_id + 1;
-                end else begin //stalling as the emptied channel has no row_length to load
-                    row_len_fifo_read <= 0;
-                end
+                end /*else begin //stalling as the emptied channel has no row_length to load*/
+                    //row_len_fifo_read <= 0;
+                /*end*/
             end else begin
                 if (mult_fifo_empty == 0) begin // if any of the mult fifos is empty, stall
                     for (i=0; i<channel_num; i=i+1) begin
@@ -87,15 +83,15 @@ module cisr_acc(
                         counters[i] <= counters[i] - 1;
                         // add the next value
                         //accumulators[i] = accumulators[i] + mult_fifo_data[(i+1)*mult_size-1-:(mult_size)];
-                        //accumulators[i] = accumulators[i] + mult_fifo_data[i*mult_size+:mult_size];
-                        accumulators[i] <= accumulators[i] + mults[i];
+                        mults[i] = mult_fifo_data[i*val_bits*2+:val_bits*2];
+                        accumulators[i] = accumulators[i] + mults[i];
                         // set FIFO to read
                         mult_fifo_read[i] <= 1; 
                     end
                 end
-                else begin // stalling because not all mult fifos are non-empty
-                    mult_fifo_read = 0; 
-                end
+                //else begin // stalling because not all mult fifos are non-empty
+                    //mult_fifo_read = 0; 
+                //end
             end
         end
     end
