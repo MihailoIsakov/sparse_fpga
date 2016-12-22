@@ -36,9 +36,12 @@ parameter val_bits = 8;
     /*parameter [0:12*13] val_addr = {13'd0, 13'd1061, 13'd2122, 13'd3183, 13'd4244, 13'd4476, 13'd4708, 13'd4940, 13'd5172, 13'd5183, 13'd5194, 13'd5205};*/
     /*parameter [0:12*13] col_addr = {13'd0, 13'd1061, 13'd2122, 13'd3183, 13'd4244, 13'd4476, 13'd4708, 13'd4940, 13'd5172, 13'd5183, 13'd5194, 13'd5205};*/
     /*parameter [0:12*13] len_addr = {9'd0,  9'd65,    9'd127,   9'd186,   9'd250,   9'd278,   9'd319,   9'd359,   9'd398,   9'd401,   9'd403,   9'd406};*/
-    parameter [0:4*13-1] val_addr = {13'd0, 13'd1061, 13'd2122, 13'd3183};
-    parameter [0:4*13-1] col_addr = {13'd0, 13'd1061, 13'd2122, 13'd3183};
-    parameter [0:4*9-1] len_addr = {9'd0,  9'd65,    9'd127,   9'd186};
+    /*parameter [0:4*13-1] val_addr = {13'd0, 13'd1061, 13'd2122, 13'd3183};*/
+    /*parameter [0:4*13-1] col_addr = {13'd0, 13'd1061, 13'd2122, 13'd3183};*/
+    /*parameter [0:4*9-1] len_addr = {9'd0,  9'd65,    9'd127,   9'd186};*/
+    parameter [0:5*13-1] val_addr = {13'd0, 13'd231, 13'd462, 13'd693, 13'd924};
+    parameter [0:5*13-1] col_addr = {13'd0, 13'd231, 13'd462, 13'd693, 13'd924};
+    parameter [0:5*9-1] len_addr = {9'd0,  9'd3,    9'd6,   9'd8, 9'd11 };
 
 // CISR + accelerator
     parameter counter_size     = 8; // must be greater than the number of elements in a row, 4 bits should be fine
